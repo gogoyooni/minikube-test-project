@@ -1,0 +1,52 @@
+# version: '3.9'
+
+services:
+  frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ./frontend_new
+      dockerfile: frontend.dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development  # 개발 환경 설정
+      - NEXT_PUBLIC_API_URL=/api/v1/  # 상대 경로로 변경
+      # - NEXT_PUBLIC_API_URL=http://backend:6666/api/v1
+    restart: always
+    networks:
+      - app-network
+    depends_on:
+      - backend
+  backend:
+    container_name: backend
+    image: backend
+    build:
+      context: ./backend_new
+      dockerfile: backend.dockerfile
+    ports:
+      - 6666:6666
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432?/postgres?schema=public
+    depends_on:
+      - db
+    networks:
+      - app-network
+  db:
+    container_name: db
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  pgdata: {}
