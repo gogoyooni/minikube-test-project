@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: backend-service
 spec:
   ports:
-    - port: 6666
-      targetPort: 6666
+    - port: 8080
+      targetPort: 8080
   selector:
     app: backend
 ---
@@ -34,16 +34,12 @@ spec:
       labels:
         app: backend
     spec:
-      initContainers:
-        - name: wait-for-db
-          image: busybox
-          command: ['sh', '-c', 'until nc -z db 5432; do echo waiting for db; sleep 2; done;']
       containers:
         - name: backend
-          image: backend:latest
+          image: backend:prod
           imagePullPolicy: Never
           ports:
-            - containerPort: 6666
+            - containerPort: 8080
           env:
             - name: DATABASE_URL
               valueFrom:
@@ -94,4 +90,4 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 1Gi
+            storage: 500Mi

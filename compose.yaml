@@ -6,13 +6,14 @@ services:
     image: frontend
     build:
       context: ./frontend_new
-      dockerfile: frontend.dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
-    environment:
-      - NODE_ENV=development  # 개발 환경 설정
-      - NEXT_PUBLIC_API_URL=/api/v1/  # 상대 경로로 변경
-      # - NEXT_PUBLIC_API_URL=http://backend:6666/api/v1
+    # environment:
+    #   - NODE_ENV=development  # 개발 환경 설정
+    #   # - NEXT_PUBLIC_API_URL=/api/v1/  # 상대 경로로 변경
+    #   - NEXT_PUBLIC_API_URL=http://backend:8080/api/v1 #이게 가장 처음 되던거
+      # - NEXT_PUBLIC_API_URL=http://localhost:6666/api/v1
     restart: always
     networks:
       - app-network
@@ -25,11 +26,15 @@ services:
       context: ./backend_new
       dockerfile: backend.dockerfile
     ports:
-      - 6666:6666
+      - "8080:8080"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432?/postgres?schema=public
+        - NODE_ENV=development
+        - PORT=8080  # 포트 환경변수 추가
+        - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres?schema=public
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: always  # on-failure 대신 always 사용
     networks:
       - app-network
   db:
@@ -44,6 +49,14 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s  # 컨테이너 시작 후 헬스체크 시작까지 대기 시간
 
 networks:
   app-network:

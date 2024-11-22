@@ -95,17 +95,19 @@
 
 
 
+## 프로덕션용 도커 이미지
 
-
-# 빌더 스테이지
+# # 빌더 스테이지
 FROM node:20 AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
 
-# NODE_ENV를 production으로 설정하여 빌드
+
+# 빌드 시 환경변수 설정
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_API_URL=http://backend-service/api/v1
 
 RUN npm run build
 
@@ -120,11 +122,6 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 3000
 CMD ["npm", "start"]
-
-
-
-
-
 
 
 

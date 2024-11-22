@@ -30,22 +30,22 @@ const nextConfig: NextConfig = {
       // 로컬 Docker Compose 개발 환경
       return [
         {
-          source: "/api/v1/:path*/",
-          destination: "http://backend:6666/api/v1/:path*/",
+          source: "/api/v1/:path*",
+          destination: "http://backend-service:8080/api/v1/:path*",
         },
       ];
     } else {
       // Production (Kubernetes with Ingress) 환경
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1/';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
       return [
         {
-          source: "/api/v1/:path*/",
-          destination: `${API_URL}/:path*/`,
+          source: "/api/v1/:path*",
+          destination: `${API_URL}/:path*`,
         },
       ];
     }
   },
-  trailingSlash: true,
+  // trailingSlash: true,
 };
 
 export default nextConfig;

@@ -53,21 +53,24 @@ interface User {
 }
 
 export default function Home() {
-  // const apiUrl =
-  //   process.env.NODE_ENV === "development"
-  //     ? "http://0.0.0.0:6666/api/v1/"
-  //     : "/api/v1/"; // 상대 경로 사용
-  const apiUrl = '/api/v1/';
+  const apiUrl =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:8080/api/v1"
+      : "/api/v1"; // 상대 경로 사용
+  // const apiUrl = '/api/v1/';
   const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({ name: "", email: "" });
   const [updateUser, setUpdateUser] = useState({ id: "", name: "", email: "" });
 
   //fetch users
   useEffect(() => {
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);  // 환경변수 값 출력
+    console.log('NODE_ENV:', process.env.NODE_ENV);  // 환경 확인
     const fetchData = async () => {
+      
       try {
         // const response = await axios.get(`${apiUrl}/users`);
-        const response = await axios.get(`${apiUrl}test/`);
+        const response = await axios.get(`${apiUrl}/test`);
 
         // setUsers(response.data.reverse());
         setUsers(response.data.users);
@@ -83,7 +86,7 @@ export default function Home() {
   const createUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${apiUrl}users/`, newUser);
+      const response = await axios.post(`${apiUrl}/users/`, newUser);
       setUsers([response.data, ...users]);
       setNewUser({ name: "", email: "" });
     } catch (error) {
@@ -95,7 +98,7 @@ export default function Home() {
   const handleUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await axios.put(`${apiUrl}users/${updateUser.id}/`, {
+      await axios.put(`${apiUrl}/users/${updateUser.id}/`, {
         name: updateUser.name,
         email: updateUser.email,
       });
@@ -116,7 +119,7 @@ export default function Home() {
   //delete user
   const deleteUser = async (userId: number) => {
     try {
-      await axios.delete(`${apiUrl}users/${userId}/`);
+      await axios.delete(`${apiUrl}/users/${userId}/`);
       setUsers(users.filter((user) => user.id !== userId));
     } catch (error) {
       console.error("Error deleting user:", error);

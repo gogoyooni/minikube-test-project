@@ -12,6 +12,12 @@ app.use(cors());
 
 app.use(express.json());
 
+
+// 기본 라우트 추가
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
 app.get("/api/v1/test", (req, res) => {
   try {
     const users = [
@@ -105,4 +111,8 @@ app.delete("/api/v1/users/:id", async (req, res) => {
   }
 });
 
-app.listen(6666, () => console.log("App listening on port 6666!"));
+const PORT = process.env.PORT || 8080; 
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
+});
+// app.listen(6666, () => console.log("App listening on port 6666!"));
